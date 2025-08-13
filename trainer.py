@@ -853,6 +853,7 @@ def main(args):
         max_steps=args.max_steps,
         every_plot_step=args.every_plot_step,
         dataset_path=args.dataset_path,
+        val_dataset_path=args.val_dataset_path,
         checkpoint_dir=args.checkpoint_dir,
         adapter_name=args.exp_name,
         lora_config_path=args.lora_config_path
