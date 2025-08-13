@@ -57,6 +57,7 @@ class Pipeline(LightningModule):
         dataset_path: str = "./data/your_dataset_path",
         val_dataset_path: str = None,
         lora_config_path: str = None,
+        logger_dir: str = "./exps/logs/",
         adapter_name: str = "lora_adapter",
     ):
         super().__init__()
@@ -886,7 +887,8 @@ def main(args):
         checkpoint_dir=args.checkpoint_dir,
         save_last=args.save_last,
         adapter_name=args.exp_name,
-        lora_config_path=args.lora_config_path
+        lora_config_path=args.lora_config_path,
+        logger_dir=args.logger_dir,
     )
     checkpoint_callback = ModelCheckpoint(
         monitor=None,
