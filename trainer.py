@@ -659,15 +659,16 @@ class Pipeline(LightningModule):
         epoch = self.current_epoch
         step = self.global_step
         checkpoint_name = f"epoch={epoch}-step={step}_lora"
-        checkpoint_dir = os.path.join(log_dir, "checkpoints", checkpoint_name)
-        os.makedirs(checkpoint_dir, exist_ok=True)
-        self.transformers.save_lora_adapter(checkpoint_dir, adapter_name=self.adapter_name)
+        checkpoint_dir = os.path.join(log_dir, "checkpoints")
+        checkpoint_dir_lora = os.path.join(checkpoint_dir, checkpoint_name)
+        os.makedirs(checkpoint_dir_lora, exist_ok=True)
+        self.transformers.save_lora_adapter(checkpoint_dir_lora, adapter_name=self.adapter_name)
+        self.hparams.save_last
         
         # Clean up old loras and only save the last few loras
         lora_paths = glob(os.path.join(checkpoint_dir, "*_lora"))
         lora_paths = natsorted(lora_paths)
         if len(lora_paths) > self.hparams.save_last:
-            print(f"here and {lora_paths[0]}")
             shutil.rmtree(lora_paths[0])
         return state
 
