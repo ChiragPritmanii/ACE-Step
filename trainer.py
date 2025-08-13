@@ -653,7 +653,8 @@ class Pipeline(LightningModule):
 
     def on_save_checkpoint(self, checkpoint):
         state = {}
-        log_dir = self.logger.log_dir
+        # log_dir = self.logger.log_dir
+        log_dir = self.hparams.logger_dir
         epoch = self.current_epoch
         step = self.global_step
         checkpoint_name = f"epoch={epoch}-step={step}_lora"
