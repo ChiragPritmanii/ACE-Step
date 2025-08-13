@@ -27,6 +27,9 @@ import random
 import os
 from acestep.pipeline_ace_step import ACEStepPipeline
 
+import shutil
+from glob import glob
+from natsort import natsorted
 
 matplotlib.use("Agg")
 torch.backends.cudnn.benchmark = False
@@ -48,6 +51,7 @@ class Pipeline(LightningModule):
         timestep_densities_type: str = "logit_normal",
         ssl_coeff: float = 1.0,
         checkpoint_dir=None,
+        save_last: int = 5,
         max_steps: int = 200000,
         warmup_steps: int = 10,
         dataset_path: str = "./data/your_dataset_path",
@@ -656,6 +660,12 @@ class Pipeline(LightningModule):
         checkpoint_dir = os.path.join(log_dir, "checkpoints", checkpoint_name)
         os.makedirs(checkpoint_dir, exist_ok=True)
         self.transformers.save_lora_adapter(checkpoint_dir, adapter_name=self.adapter_name)
+        
+        # Clean up old loras and only save the last few loras
+        lora_paths = glob(os.path.join(checkpoint_dir, "*_lora"))
+        lora_paths = natsorted(lora_paths)
+        if len(lora_paths) > self.hparams.save_last:
+            shutil.rmtree(lora_paths[0])
         return state
 
     @torch.no_grad()
@@ -873,6 +883,7 @@ def main(args):
         dataset_path=args.dataset_path,
         val_dataset_path=args.val_dataset_path,
         checkpoint_dir=args.checkpoint_dir,
+        save_last=args.save_last,
         adapter_name=args.exp_name,
         lora_config_path=args.lora_config_path
     )
@@ -934,6 +945,7 @@ if __name__ == "__main__":
     args.add_argument("--logger_dir", type=str, default="./exps/logs/")
     args.add_argument("--ckpt_path", type=str, default=None)
     args.add_argument("--checkpoint_dir", type=str, default=None)
+    args.add_argument("--save_last", type=int, default=5)
     args.add_argument("--gradient_clip_val", type=float, default=0.5)
     args.add_argument("--gradient_clip_algorithm", type=str, default="norm")
     args.add_argument("--reload_dataloaders_every_n_epochs", type=int, default=1)

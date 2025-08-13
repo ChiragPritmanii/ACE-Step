@@ -24,3 +24,5 @@ click
 peft
 tensorboard
 tensorboardX
+natsort
+wandb
