@@ -667,6 +667,7 @@ class Pipeline(LightningModule):
         lora_paths = glob(os.path.join(checkpoint_dir, "*_lora"))
         lora_paths = natsorted(lora_paths)
         if len(lora_paths) > self.hparams.save_last:
+            print(f"here and {lora_paths[0]}")
             shutil.rmtree(lora_paths[0])
         return state
 
