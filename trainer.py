@@ -466,7 +466,7 @@ class Pipeline(LightningModule):
             shuffle=True,
             num_workers=self.hparams.num_workers,
             pin_memory=True,
-            collate_fn=self.train_dataset.collate_fn,
+            collate_fn=self.val_dataset.collate_fn,
         )
 
     def get_sd3_sigmas(self, timesteps, device, n_dim=4, dtype=torch.float32):
