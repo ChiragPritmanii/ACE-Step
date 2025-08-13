@@ -578,26 +578,43 @@ class Pipeline(LightningModule):
 
         # prefix = "train"
         
-        self.log(
-            f"{prefix}/denoising_loss",
-            loss,
-            on_step=True,
-            on_epoch=False,
-            prog_bar=True,
-        )
+        if prefix == "train":
+            self.log(
+                f"{prefix}/denoising_loss",
+                loss,
+                on_step=True,
+                on_epoch=False,
+                prog_bar=True,
+            )
+        else:
+            self.log(
+                f"{prefix}/denoising_loss",
+                loss,
+                on_step=False,
+                on_epoch=True,
+                prog_bar=False,
+            )
 
         total_proj_loss = 0.0
         for k, v in proj_losses:
-            self.log(
-                f"{prefix}/{k}_loss", v, on_step=True, on_epoch=False, prog_bar=True
-            )
+            if prefix == "train":
+                self.log(
+                    f"{prefix}/{k}_loss", v, on_step=True, on_epoch=False, prog_bar=True
+                )
+            else:
+                self.log(
+                    f"{prefix}/{k}_loss", v, on_step=False, on_epoch=True, prog_bar=False
+                )
             total_proj_loss += v
 
         if len(proj_losses) > 0:
             total_proj_loss = total_proj_loss / len(proj_losses)
 
         loss = loss + total_proj_loss * self.ssl_coeff
-        self.log(f"{prefix}/loss", loss, on_step=True, on_epoch=False, prog_bar=True)
+        if prefix == "train":
+            self.log(f"{prefix}/loss", loss, on_step=True, on_epoch=False, prog_bar=True)
+        else:
+            self.log(f"{prefix}/loss", loss, on_step=False, on_epoch=True, prog_bar=False)
 
         # Log learning rate if scheduler exists
         if self.lr_schedulers() is not None:
