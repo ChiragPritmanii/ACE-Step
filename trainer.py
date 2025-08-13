@@ -784,7 +784,7 @@ class Pipeline(LightningModule):
             mhubert_ssl_hidden_states,
         ) = self.preprocess(batch, train=False)
 
-        infer_steps = 60
+        infer_steps = 10
         guidance_scale = 15.0
         omega_scale = 10.0
         seed_num = 2025
