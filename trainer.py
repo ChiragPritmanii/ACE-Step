@@ -463,7 +463,7 @@ class Pipeline(LightningModule):
         )
         return DataLoader(
             self.val_dataset,
-            shuffle=True,
+            shuffle=False,
             num_workers=self.hparams.num_workers,
             pin_memory=True,
             collate_fn=self.val_dataset.collate_fn,
@@ -576,8 +576,8 @@ class Pipeline(LightningModule):
         loss = loss * mask.reshape(bsz, -1).mean(1)
         loss = loss.mean()
 
-        prefix = "train"
-
+        # prefix = "train"
+        
         self.log(
             f"{prefix}/denoising_loss",
             loss,
