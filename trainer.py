@@ -918,7 +918,7 @@ if __name__ == "__main__":
     args.add_argument("--gradient_clip_algorithm", type=str, default="norm")
     args.add_argument("--reload_dataloaders_every_n_epochs", type=int, default=1)
     args.add_argument("--every_plot_step", type=int, default=2000)
-    args.add_argument("--val_check_interval", type=int, default=None)
+    args.add_argument("--val_check_interval", type=int, default=500)
     args.add_argument("--lora_config_path", type=str, default="config/zh_rap_lora_config.json")
     args = args.parse_args()
     main(args)
