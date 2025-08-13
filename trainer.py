@@ -1,5 +1,5 @@
 from pytorch_lightning.callbacks import ModelCheckpoint
-from pytorch_lightning.loggers import TensorBoardLogger
+from pytorch_lightning.loggers import WandbLogger #TensorBoardLogger
 from pytorch_lightning import Trainer
 from datetime import datetime
 import argparse
@@ -51,6 +51,7 @@ class Pipeline(LightningModule):
         max_steps: int = 200000,
         warmup_steps: int = 10,
         dataset_path: str = "./data/your_dataset_path",
+        val_dataset_path: str = None,
         lora_config_path: str = None,
         adapter_name: str = "lora_adapter",
     ):
@@ -455,6 +456,19 @@ class Pipeline(LightningModule):
             collate_fn=self.train_dataset.collate_fn,
         )
 
+    def val_dataloader(self):
+        self.val_dataset = Text2MusicDataset(
+            train=True,
+            train_dataset_path=self.hparams.val_dataset_path,
+        )
+        return DataLoader(
+            self.val_dataset,
+            shuffle=True,
+            num_workers=self.hparams.num_workers,
+            pin_memory=True,
+            collate_fn=self.train_dataset.collate_fn,
+        )
+
     def get_sd3_sigmas(self, timesteps, device, n_dim=4, dtype=torch.float32):
         sigmas = self.scheduler.sigmas.to(device=device, dtype=dtype)
         schedule_timesteps = self.scheduler.timesteps.to(device)
@@ -485,7 +499,7 @@ class Pipeline(LightningModule):
 
         return timesteps
 
-    def run_step(self, batch, batch_idx):
+    def run_step(self, batch, batch_idx, prefix="train"):
         self.plot_step(batch, batch_idx)
         (
             keys,
@@ -600,7 +614,20 @@ class Pipeline(LightningModule):
         return loss
 
     def training_step(self, batch, batch_idx):
-        return self.run_step(batch, batch_idx)
+        return self.run_step(batch, batch_idx, prefix="train")
+    
+    def on_validation_model_eval(self):
+        # only set transformers to eval mode
+        self.transformers.eval()
+        return
+    
+    def on_validation_model_train(self):
+        # only reset transformers to train mode
+        self.transformers.train()
+        return
+
+    def validation_step(self, batch, batch_idx):
+        return self.run_step(batch, batch_idx, prefix="val")
 
     def on_save_checkpoint(self, checkpoint):
         state = {}
@@ -726,10 +753,10 @@ class Pipeline(LightningModule):
             mhubert_ssl_hidden_states,
         ) = self.preprocess(batch, train=False)
 
-        infer_steps = 60
+        infer_steps = 120
         guidance_scale = 15.0
         omega_scale = 10.0
-        seed_num = 1234
+        seed_num = 2025
         random.seed(seed_num)
         bsz = target_latents.shape[0]
         random_generators = [torch.Generator(device=self.device) for _ in range(bsz)]
@@ -820,6 +847,7 @@ class Pipeline(LightningModule):
 def main(args):
     model = Pipeline(
         learning_rate=args.learning_rate,
+        warmup_steps=args.warmup_steps,
         num_workers=args.num_workers,
         shift=args.shift,
         max_steps=args.max_steps,
@@ -835,9 +863,14 @@ def main(args):
         save_top_k=-1,
     )
     # add datetime str to version
-    logger_callback = TensorBoardLogger(
-        version=datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + args.exp_name,
-        save_dir=args.logger_dir,
+    # logger_callback = TensorBoardLogger(
+    #     version=datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + args.exp_name,
+    #     save_dir=args.logger_dir,
+    # )
+
+    logger_callback = WandbLogger(
+        project="ace_diverse_lora",
+        name=args.exp_name,
     )
     trainer = Trainer(
         accelerator="gpu",
@@ -868,6 +901,7 @@ if __name__ == "__main__":
     args.add_argument("--num_nodes", type=int, default=1)
     args.add_argument("--shift", type=float, default=3.0)
     args.add_argument("--learning_rate", type=float, default=1e-4)
+    args.add_argument("--warmup_steps", type=int, default=100)
     args.add_argument("--num_workers", type=int, default=8)
     args.add_argument("--epochs", type=int, default=-1)
     args.add_argument("--max_steps", type=int, default=2000000)
