@@ -617,15 +617,16 @@ class Pipeline(LightningModule):
             self.log(f"{prefix}/loss", loss, on_step=False, on_epoch=True, prog_bar=False)
 
         # Log learning rate if scheduler exists
-        if self.lr_schedulers() is not None:
-            learning_rate = self.lr_schedulers().get_last_lr()[0]
-            self.log(
-                f"{prefix}/learning_rate",
-                learning_rate,
-                on_step=True,
-                on_epoch=False,
-                prog_bar=True,
-            )
+        if prefix == "train":
+            if self.lr_schedulers() is not None:
+                learning_rate = self.lr_schedulers().get_last_lr()[0]
+                self.log(
+                    f"{prefix}/learning_rate",
+                    learning_rate,
+                    on_step=True,
+                    on_epoch=False,
+                    prog_bar=True,
+                )
         # with torch.autograd.detect_anomaly():
         #     self.manual_backward(loss)
         return loss
@@ -770,7 +771,7 @@ class Pipeline(LightningModule):
             mhubert_ssl_hidden_states,
         ) = self.preprocess(batch, train=False)
 
-        infer_steps = 120
+        infer_steps = 60
         guidance_scale = 15.0
         omega_scale = 10.0
         seed_num = 2025
