@@ -860,8 +860,8 @@ class Pipeline(LightningModule):
             prompt = prompt
             lyric = self.construct_lyrics(candidate_lyric_chunk)
             key_prompt_lyric = f"# KEY\n\n{key}\n\n\n# PROMPT\n\n{prompt}\n\n\n# LYRIC\n\n{lyric}\n\n# SEED\n\n{seed}\n\n"
-            log_dir = self.logger.log_dir
-            save_dir = f"{log_dir}/eval_results/step_{self.global_step}"
+            log_dir = self.hparams.logger_dir
+            save_dir = os.path.join(log_dir,"/eval_results/step_{self.global_step}")
             if not os.path.exists(save_dir):
                 os.makedirs(save_dir, exist_ok=True)
             torchaudio.save(
