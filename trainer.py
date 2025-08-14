@@ -505,7 +505,8 @@ class Pipeline(LightningModule):
         return timesteps
 
     def run_step(self, batch, batch_idx, prefix="train"):
-        self.plot_step(batch, batch_idx)
+        if prefix == "train":
+            self.plot_step(batch, batch_idx)
         (
             keys,
             target_latents,
