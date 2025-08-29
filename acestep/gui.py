@@ -72,7 +72,7 @@ def main(checkpoint_path, server_name, port, device_id, share, bf16, torch_compi
         sample_data_func=data_sampler.sample,
         load_data_func=data_sampler.load_json,
     )
-    demo.launch(server_name=server_name, server_port=port, share=share)
+    demo.launch(server_name=server_name, server_port=port, share=share, inbrowser=True, show_error=True)
 
 
 if __name__ == "__main__":
