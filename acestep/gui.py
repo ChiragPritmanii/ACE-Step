@@ -19,7 +19,7 @@ import click
 @click.option(
     "--server_name",
     type=str,
-    default="127.0.0.1",
+    default="0.0.0.0",
     help="The server name to use for the Gradio app.",
 )
 @click.option(
@@ -47,6 +47,7 @@ import click
 @click.option(
     "--overlapped_decode", type=bool, default=False, help="Whether to use overlapped decoding (run dcae and vocoder using sliding windows)"
 )
+
 def main(checkpoint_path, server_name, port, device_id, share, bf16, torch_compile, cpu_offload, overlapped_decode):
     """
     Main function to launch the ACE Step pipeline demo.
