@@ -38,45 +38,36 @@ def parse_args():
     )
     parser.add_argument(
         "--share",
-        action="store_true",
+        type=bool,
+        default=False,
         help="Whether to create a public, shareable link for the Gradio app."
     )
-    parser.add_argument(
-        "--no-share",
-        dest="share",
-        action="store_false",
-        help="Disable share mode."
-    )
-    parser.set_defaults(share=False)
 
     parser.add_argument(
         "--bf16",
-        action="store_true",
+        type=bool,
+        default=False,
         help="Use bfloat16 precision. Turn off if using MPS."
     )
-    parser.add_argument(
-        "--no-bf16",
-        dest="bf16",
-        action="store_false",
-        help="Disable bfloat16 precision."
-    )
-    parser.set_defaults(bf16=True)
 
     parser.add_argument(
         "--torch_compile",
-        action="store_true",
+        type=bool,
+        default=False,
         help="Whether to use torch.compile."
     )
 
     parser.add_argument(
         "--cpu_offload",
-        action="store_true",
+        type=bool,
+        default=False,
         help="Whether to use CPU offloading (only load current stage's model to GPU)."
     )
 
     parser.add_argument(
         "--overlapped_decode",
-        action="store_true",
+        type=bool,
+        default=False,
         help="Whether to use overlapped decoding (run dcae and vocoder using sliding windows)."
     )
 
