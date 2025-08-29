@@ -23,7 +23,7 @@ import click
     help="The server name to use for the Gradio app.",
 )
 @click.option(
-    "--port", type=int, default=7865, help="The port to use for the Gradio app."
+    "--port", type=int, default=7860, help="The port to use for the Gradio app."
 )
 @click.option("--device_id", type=int, default=0, help="The CUDA device ID to use.")
 @click.option(
