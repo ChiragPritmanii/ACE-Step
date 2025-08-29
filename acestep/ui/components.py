@@ -1002,13 +1002,13 @@ def create_main_demo_ui(
             <h1 style="text-align: center;">Wubble GEN 4 Demo</h1>
         """
         )
-        # with gr.Tab("text2music"):
-        #     create_text2music_ui(
-        #         gr=gr,
-        #         text2music_process_func=text2music_process_func,
-        #         sample_data_func=sample_data_func,
-        #         load_data_func=load_data_func,
-        #     )
+        with gr.Tab("text2music"):
+            create_text2music_ui(
+                gr=gr,
+                text2music_process_func=text2music_process_func,
+                sample_data_func=sample_data_func,
+                load_data_func=load_data_func,
+            )
     return demo
 
 import os
@@ -1121,8 +1121,8 @@ if __name__ == "__main__":
     )
     demo = create_main_demo_ui()
     demo.launch(
-        server_name="0.0.0.0",
-        server_port=7860,
+        server_name=server_name,
+        server_port=server_port,
         inbrowser=True,
         show_error=True
     )
