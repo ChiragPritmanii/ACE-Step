@@ -128,7 +128,7 @@ def create_text2music_ui(
                 audio2audio_enable = gr.Checkbox(label="Enable Audio2Audio", value=False, info="Check to enable Audio-to-Audio generation using a reference audio.", elem_id="audio2audio_checkbox")
                 lora_name_or_path = gr.Dropdown(
                     label="Lora Name or Path",
-                    choices=["ACE-Step/ACE-Step-v1-chinese-rap-LoRA", "none"],
+                    choices=["ACE-Step/ACE-Step-v1-chinese-rap-LoRA", "none", "/home/chirag_pritmani24/training_logs/lora_n150_s2/checkpoints/epoch=413-step=62000_lora"],
                     value="none",
                     allow_custom_value=True,
                     min_width=300
