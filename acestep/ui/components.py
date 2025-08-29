@@ -1119,10 +1119,10 @@ if __name__ == "__main__":
         sample_data_func=data_sampler.sample,
         load_data_func=data_sampler.load_json,
     )
-    demo = create_main_demo_ui()
+    # demo = create_main_demo_ui()
     demo.launch(
         server_name=server_name,
-        server_port=server_port,
+        server_port=port,
         inbrowser=True,
         show_error=True
     )
