@@ -995,20 +995,20 @@ def create_main_demo_ui(
     load_data_func=dump_func,
 ):
     with gr.Blocks(
-        title="Wubble GEN-4 Demo",
+        title="Wubble GEN 4 Demo",
     ) as demo:
         gr.Markdown(
             """
-            <h1 style="text-align: center;">Wubble GEN-4 Demo</h1>
+            <h1 style="text-align: center;">Wubble GEN 4 Demo</h1>
         """
         )
-        with gr.Tab("text2music"):
-            create_text2music_ui(
-                gr=gr,
-                text2music_process_func=text2music_process_func,
-                sample_data_func=sample_data_func,
-                load_data_func=load_data_func,
-            )
+        # with gr.Tab("text2music"):
+        #     create_text2music_ui(
+        #         gr=gr,
+        #         text2music_process_func=text2music_process_func,
+        #         sample_data_func=sample_data_func,
+        #         load_data_func=load_data_func,
+        #     )
     return demo
 
 
