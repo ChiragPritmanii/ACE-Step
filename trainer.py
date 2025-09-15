@@ -668,7 +668,6 @@ class Pipeline(LightningModule):
         checkpoint_dir_lora = os.path.join(checkpoint_dir, checkpoint_name)
         os.makedirs(checkpoint_dir_lora, exist_ok=True)
         self.transformers.save_lora_adapter(checkpoint_dir_lora, adapter_name=self.adapter_name)
-        self.hparams.save_last
         
         # Clean up old loras and only save the last few loras
         lora_paths = glob(os.path.join(checkpoint_dir, "*_lora"))
@@ -880,9 +879,10 @@ class Pipeline(LightningModule):
                 f"{save_dir}/key_prompt_lyric_{key}_{i}.txt", "w", encoding="utf-8"
             ) as f:
                 f.write(key_prompt_lyric)
+
+            exp_name = log_dir.split("/")[-1].split("_logs")[0]
             
             txt_path, res_path = gen_paths_to_txt(run=self.hparams.exp_name, step=global_step)
-            
              
             cmd = [
                 "python", f"{root}/SongEval/eval.py",
@@ -892,7 +892,7 @@ class Pipeline(LightningModule):
 
             # Run command
             subprocess.run(cmd, check=True)
-            co, mu, mem, cl, nat = get_seval(run=self.hparams.exp_name, step=global_step)
+            co, mu, mem, cl, nat = get_seval(run=exp_name, step=global_step)
 
             self.log(
                 "eval/coherence",
