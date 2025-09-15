@@ -36,11 +36,11 @@ def get_seval(run, step):
             elif ki=="Naturalness":
                 nat+=seval[k][ki]
         
-        co /= len(seval)
-        mu /= len(seval)
-        mem /= len(seval)
-        cl /= len(seval)
-        nat /= len(seval)
-    
-        print(f"songeval [co, mu, mem, cl, nat]: {[co, mu, mem, cl, nat]}")
-        return co, mu, mem, cl, nat
+    co /= len(seval)
+    mu /= len(seval)
+    mem /= len(seval)
+    cl /= len(seval)
+    nat /= len(seval)
+
+    print(f"songeval [co, mu, mem, cl, nat]: {[co, mu, mem, cl, nat]}")
+    return co, mu, mem, cl, nat

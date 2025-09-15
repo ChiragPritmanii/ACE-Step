@@ -25,6 +25,7 @@ from acestep.apg_guidance import apg_forward, MomentumBuffer
 from tqdm import tqdm
 import random
 import os
+import subprocess
 from acestep.pipeline_ace_step import ACEStepPipeline
 
 import shutil
@@ -840,6 +841,7 @@ class Pipeline(LightningModule):
 
 
     def plot_step(self, batch, batch_idx):
+        root = "/home/chirag_pritmani24/"
         global_step = self.global_step
         if (
             global_step % self.hparams.every_plot_step != 0
@@ -881,6 +883,16 @@ class Pipeline(LightningModule):
                 f.write(key_prompt_lyric)
             
             txt_path, res_path = gen_paths_to_txt(run=self.hparams.exp_name, step=global_step)
+            
+             
+            cmd = [
+                "python", f"{root}/SongEval/eval.py",
+                "-i", txt_path,
+                "-o", res_path,
+                ]
+
+            # Run command
+            subprocess.run(cmd, check=True)
             co, mu, mem, cl, nat = get_seval(run=self.hparams.exp_name, step=global_step)
 
             self.log(
