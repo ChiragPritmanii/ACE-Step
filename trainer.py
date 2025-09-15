@@ -882,7 +882,7 @@ class Pipeline(LightningModule):
 
             exp_name = log_dir.split("/")[-1].split("_logs")[0]
             
-            txt_path, res_path = gen_paths_to_txt(run=self.hparams.exp_name, step=global_step)
+            txt_path, res_path = gen_paths_to_txt(run=exp_name, step=global_step)
              
             cmd = [
                 "python", f"{root}/SongEval/eval.py",
