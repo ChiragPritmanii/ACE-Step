@@ -470,14 +470,13 @@ class Pipeline(LightningModule):
             train=True,
             train_dataset_path=self.hparams.val_dataset_path,
         )
-        # return DataLoader(
-        #     self.val_dataset,
-        #     shuffle=False,
-        #     num_workers=self.hparams.num_workers,
-        #     pin_memory=True,
-        #     collate_fn=self.val_dataset.collate_fn,
-        # )
-        return None
+        return DataLoader(
+            self.val_dataset,
+            shuffle=False,
+            num_workers=self.hparams.num_workers,
+            pin_memory=True,
+            collate_fn=self.val_dataset.collate_fn,
+        )
 
     def get_sd3_sigmas(self, timesteps, device, n_dim=4, dtype=torch.float32):
         sigmas = self.scheduler.sigmas.to(device=device, dtype=dtype)
