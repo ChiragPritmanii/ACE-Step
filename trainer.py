@@ -31,6 +31,9 @@ import shutil
 from glob import glob
 from natsort import natsorted
 
+from eval import get_seval, gen_paths_to_txt
+
+
 matplotlib.use("Agg")
 torch.backends.cudnn.benchmark = False
 torch.set_float32_matmul_precision("high")
@@ -798,7 +801,7 @@ class Pipeline(LightningModule):
             seed = random.randint(0, 2**32 - 1)
             random_generators[i].manual_seed(seed)
             seeds.append(seed)
-        duration = 240  # Fixed duration (24 * 10)
+        duration = 180  # Fixed duration (24 * 10)
         pred_latents = self.diffusion_process(
             duration=duration,
             encoder_text_hidden_states=encoder_text_hidden_states,
@@ -833,6 +836,7 @@ class Pipeline(LightningModule):
 
         lyrics = "\n".join(lyrics)
         return lyrics
+
 
     def plot_step(self, batch, batch_idx):
         global_step = self.global_step
@@ -874,6 +878,45 @@ class Pipeline(LightningModule):
                 f"{save_dir}/key_prompt_lyric_{key}_{i}.txt", "w", encoding="utf-8"
             ) as f:
                 f.write(key_prompt_lyric)
+            
+            txt_path, res_path = gen_paths_to_txt(run=self.hparams.exp_name, step=global_step)
+            co, mu, mem, cl, nat = get_seval(run=self.hparams.exp_name, step=global_step)
+
+            self.log(
+                "eval/coherence",
+                co,
+                on_step=False,
+                on_epoch=True,
+                prog_bar=False,
+            )
+            self.log(
+                "eval/musicality",
+                mu,
+                on_step=False,
+                on_epoch=True,
+                prog_bar=False,
+            )
+            self.log(
+                "eval/memorability",
+                mem,
+                on_step=False,
+                on_epoch=True,
+                prog_bar=False,
+            )
+            self.log(
+                "eval/clarity",
+                cl,
+                on_step=False,
+                on_epoch=True,
+                prog_bar=False,
+            )
+            self.log(
+                "eval/naturalness",
+                nat,
+                on_step=False,
+                on_epoch=True,
+                prog_bar=False,
+            )
             i += 1
 
 
