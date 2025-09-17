@@ -25,15 +25,11 @@ from acestep.apg_guidance import apg_forward, MomentumBuffer
 from tqdm import tqdm
 import random
 import os
-import subprocess
 from acestep.pipeline_ace_step import ACEStepPipeline
 
 import shutil
 from glob import glob
 from natsort import natsorted
-
-from eval import get_seval, gen_paths_to_txt
-
 
 matplotlib.use("Agg")
 torch.backends.cudnn.benchmark = False
@@ -668,6 +664,7 @@ class Pipeline(LightningModule):
         checkpoint_dir_lora = os.path.join(checkpoint_dir, checkpoint_name)
         os.makedirs(checkpoint_dir_lora, exist_ok=True)
         self.transformers.save_lora_adapter(checkpoint_dir_lora, adapter_name=self.adapter_name)
+        self.hparams.save_last
         
         # Clean up old loras and only save the last few loras
         lora_paths = glob(os.path.join(checkpoint_dir, "*_lora"))
@@ -801,7 +798,7 @@ class Pipeline(LightningModule):
             seed = random.randint(0, 2**32 - 1)
             random_generators[i].manual_seed(seed)
             seeds.append(seed)
-        duration = 180  # Fixed duration (24 * 10)
+        duration = 240  # Fixed duration (24 * 10)
         pred_latents = self.diffusion_process(
             duration=duration,
             encoder_text_hidden_states=encoder_text_hidden_states,
@@ -837,9 +834,7 @@ class Pipeline(LightningModule):
         lyrics = "\n".join(lyrics)
         return lyrics
 
-
     def plot_step(self, batch, batch_idx):
-        root = "/home/chirag_pritmani24/"
         global_step = self.global_step
         if (
             global_step % self.hparams.every_plot_step != 0
@@ -879,56 +874,6 @@ class Pipeline(LightningModule):
                 f"{save_dir}/key_prompt_lyric_{key}_{i}.txt", "w", encoding="utf-8"
             ) as f:
                 f.write(key_prompt_lyric)
-
-            exp_name = log_dir.split("/")[-1].split("_logs")[0]
-            
-            txt_path, res_path = gen_paths_to_txt(run=exp_name, step=global_step)
-             
-            cmd = [
-                "python", f"{root}/SongEval/eval.py",
-                "-i", txt_path,
-                "-o", res_path,
-                ]
-
-            # Run command
-            subprocess.run(cmd, check=True)
-            co, mu, mem, cl, nat = get_seval(run=exp_name, step=global_step)
-
-            self.log(
-                "eval/coherence",
-                co,
-                on_step=False,
-                on_epoch=True,
-                prog_bar=False,
-            )
-            self.log(
-                "eval/musicality",
-                mu,
-                on_step=False,
-                on_epoch=True,
-                prog_bar=False,
-            )
-            self.log(
-                "eval/memorability",
-                mem,
-                on_step=False,
-                on_epoch=True,
-                prog_bar=False,
-            )
-            self.log(
-                "eval/clarity",
-                cl,
-                on_step=False,
-                on_epoch=True,
-                prog_bar=False,
-            )
-            self.log(
-                "eval/naturalness",
-                nat,
-                on_step=False,
-                on_epoch=True,
-                prog_bar=False,
-            )
             i += 1
 
 
